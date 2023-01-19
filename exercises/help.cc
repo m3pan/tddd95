@@ -7,34 +7,40 @@
 int main() {
 
     // split input by '\r' and blank space into a nested list
-    std::ifstream ifs{"../exercises/input/help.txt"};       // cwd: TDDD95/cmake-build-debug/
-    std::string line{};
-    std::vector <std::vector<std::string>> lines{};
-    std::string word{};
+    // std::ifstream ifs{"../exercises/input/help.txt"} cwd: TDDD95/cmake-build-debug/
+    std::string line;
+    std::vector <std::vector <std::string> > lines;
+    std::string word;
+    int nr;
+    char ws;
 
+    std::cout << "enter number of testcases: " << std::endl;
+    std::cin >> nr;
+    ws = std::cin.get(); // stream out any whitespace
 
-    while (getline(ifs, line, '\r'))
+    for (int i = 0; i < 2*nr; i++)
     {
+        std::cout << "enter a phrase: " << std::endl;
+        std::string line;
+        std::getline (std::cin, line);
+
         std::istringstream iss_string(line);
-        std::vector <std::string> lineVec{};
+        std::vector <std::string> lineVec;
 
         while (iss_string >> word) lineVec.push_back(word);
 
         lines.push_back(lineVec);
     }
 
-    int nr = std::stoi(lines[0][0]);
-    lines.erase(lines.begin(), lines.begin() + 1);
-
     for (int i = 0; i <= 2*nr; i = i+2)
     {
-        std::vector<std::string> line1 {lines[i]};
-        std::vector<std::string> line2 {lines[i + 1]};
-        std::string output{};
+        std::vector<std::string> line1 = lines[i];
+        std::vector<std::string> line2 = lines[i + 1];
+        std::string output;
 
         // adds the placeholders to maps
-        std::map<std::string, std::string> patterns1{};
-        std::map<std::string, std::string> patterns2{};
+        std::map<std::string, std::string> patterns1;
+        std::map<std::string, std::string> patterns2;
 
         for (int j = 0; j < line1.size(); j++)
         {
@@ -47,7 +53,8 @@ int main() {
                 }
                 if (patterns1[line1[j]] == line2[j])
                 {
-                    output += ' ' + line2[j];
+                    if (output.empty()) output = line2[j];
+                    else output += ' ' + line2[j];
                 }
             }
 
@@ -60,8 +67,10 @@ int main() {
                 }
                 if (patterns2[line2[j]] == line1[j])
                 {
-                    output += ' ' + line1[j];
-                } else
+                    if (output.empty()) output = line1[j];
+                    else output += ' ' + line1[j];
+                }
+                else
                 {
                     output = '-';
                 }
@@ -70,7 +79,8 @@ int main() {
             {
                 if (line2[j] == line1[j])
                 {
-                    output += ' ' + line1[j];
+                    if (output.empty()) output = line1[j];
+                    else output += ' ' + line1[j];
                 }
                 else
                 {
