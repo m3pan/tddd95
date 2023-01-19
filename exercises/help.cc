@@ -8,21 +8,26 @@ int main() {
 
     // split input by '\r' and blank space into a nested list
     // std::ifstream ifs{"../exercises/input/help.txt"} cwd: TDDD95/cmake-build-debug/
-    std::string line;
     std::vector <std::vector <std::string> > lines;
     std::string word;
+    std::string unknown = "liu";
+    std::string nr_st;
     int nr;
     char ws;
 
-    std::cout << "enter number of testcases: " << std::endl;
-    std::cin >> nr;
-    ws = std::cin.get(); // stream out any whitespace
+    // std::cin >> nr;
+    std::getline (std::cin, nr_st, '\r');
+    std::stringstream ss(nr_st);
+    ss >> nr;
+
+    std::cout << "nr: " << nr << std::endl;
+    // ws = std::cin.get(); // stream out any whitespace
+    std::string line;
 
     for (int i = 0; i < 2*nr; i++)
     {
-        std::cout << "enter a phrase: " << std::endl;
-        std::string line;
-        std::getline (std::cin, line);
+        std::getline (std::cin, line, '\r');
+        std::cout << "line: " << line << std::endl;
 
         std::istringstream iss_string(line);
         std::vector <std::string> lineVec;
@@ -32,7 +37,7 @@ int main() {
         lines.push_back(lineVec);
     }
 
-    for (int i = 0; i <= 2*nr; i = i+2)
+    for (int i = 0; i < 2*nr; i = i+2)
     {
         std::vector<std::string> line1 = lines[i];
         std::vector<std::string> line2 = lines[i + 1];
@@ -73,6 +78,7 @@ int main() {
                 else
                 {
                     output = '-';
+                    break;
                 }
             }
             else if (line2[j][0] != '<' && line1[j][0]!= '<')
@@ -85,7 +91,13 @@ int main() {
                 else
                 {
                     output = '-';
+                    break;
                 }
+            }
+            else if (line2[j][0] == '<' && line1[j][0] == '<')
+            {
+                if (output.empty()) output = unknown;
+                else output += ' ' + unknown;
             }
         }
         std::cout << output << '\n';
