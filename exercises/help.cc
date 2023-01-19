@@ -26,45 +26,59 @@ int main() {
     int nr = std::stoi(lines[0][0]);
     lines.erase(lines.begin(), lines.begin() + 1);
 
-    for (int i = 0; i < nr; i++)
+    for (int i = 0; i <= 2*nr; i = i+2)
     {
         std::vector<std::string> line1 {lines[i]};
         std::vector<std::string> line2 {lines[i + 1]};
         std::string output{};
+
+        // adds the placeholders to maps
+        std::map<std::string, std::string> patterns1{};
+        std::map<std::string, std::string> patterns2{};
+
         for (int j = 0; j < line1.size(); j++)
         {
-            // adds the placeholders to maps
-            std::map<char, std::string> patterns1;
-            std::map<char, std::string> patterns2;
-
             if (line1[j][0] == '<' && line2[j][0]!= '<')
             {
-                if (patterns1.count(line1[j][1]) == false)
+                if (patterns1.count(line1[j]) == false)
                 // if we haven't added the placeholder to the map
                 {
-                    patterns1[line1[j][1]] = line2[j];
+                    patterns1[line1[j]] = line2[j];
                 }
-                if (patterns1[line1[j][1]] == line2[j])
+                if (patterns1[line1[j]] == line2[j])
                 {
                     output += ' ' + line2[j];
                 }
-
             }
 
             else if (line2[j][0] == '<' && line1[j][0]!= '<')
             {
-                if (patterns2.count(line2[j][1]) == false)
+                if (patterns2.count(line2[j]) == false)
                     // if we haven't added the placeholder to the map
                 {
-                    patterns2[line2[j][1]] = line1[j];
+                    patterns2[line2[j]] = line1[j];
                 }
-                if (patterns2[line2[j][1]] == line1[j])
+                if (patterns2[line2[j]] == line1[j])
+                {
+                    output += ' ' + line1[j];
+                } else
+                {
+                    output = '-';
+                }
+            }
+            else if (line2[j][0] != '<' && line1[j][0]!= '<')
+            {
+                if (line2[j] == line1[j])
                 {
                     output += ' ' + line1[j];
                 }
+                else
+                {
+                    output = '-';
+                }
             }
         }
-        std::cout << output << std::endl;
+        std::cout << output << '\n';
     }
 
     return 0;
