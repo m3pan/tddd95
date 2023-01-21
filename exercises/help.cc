@@ -16,14 +16,14 @@ int main() {
     char ws;
 
     // std::cin >> nr;
-    std::getline (std::cin, nr_st, '\r');
+    std::getline (std::cin, nr_st, '\r'); // change to '\r' when reading from file
     std::stringstream ss(nr_st);
     ss >> nr;
 
     std::cout << "nr: " << nr << std::endl;
     // ws = std::cin.get(); // stream out any whitespace
     std::string line;
-    bool restart = false;
+    int restart = 0;
 
     for (int i = 0; i < 2*nr; i++)
     {
@@ -117,19 +117,19 @@ int main() {
                     patterns1[line1[j]] = patterns2[line2[j]];
                     if (output.empty()) output = patterns2[line2[j]];
                     else output += ' ' + patterns2[line2[j]];
-                    restart = true;
+                    restart = 1;
                 }
                 else {
                     // vi känner inte till nån
                     if (output.empty()) output = unknown;
                     else output += ' ' + unknown;
-                    restart = true;
+                    restart += 1;
                 }
             }
-            if (j == line1.size() - 1 && restart)
+            if (j == line1.size() - 1 && restart == 1)
             {
-                j = 0;
-                restart = false;
+                j = -1;
+                restart = 2;
                 output = "";
             }
         }
