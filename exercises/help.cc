@@ -10,7 +10,7 @@ int main() {
     // std::ifstream ifs{"../exercises/input/help.txt"} cwd: TDDD95/cmake-build-debug/
     std::vector <std::vector <std::string> > lines;
     std::string word;
-    std::string unknown = "liu";
+    std::string unknown = "hmm";
     std::string nr_st;
     int nr;
     char ws;
@@ -23,12 +23,11 @@ int main() {
     std::cout << "nr: " << nr << std::endl;
     // ws = std::cin.get(); // stream out any whitespace
     std::string line;
+    bool restart = false;
 
     for (int i = 0; i < 2*nr; i++)
     {
         std::getline (std::cin, line, '\r');
-        std::cout << "line: " << line << std::endl;
-
         std::istringstream iss_string(line);
         std::vector <std::string> lineVec;
 
@@ -62,7 +61,6 @@ int main() {
                     else output += ' ' + line2[j];
                 }
             }
-
             else if (line2[j][0] == '<' && line1[j][0]!= '<')
             {
                 if (patterns2.count(line2[j]) == false)
@@ -96,8 +94,43 @@ int main() {
             }
             else if (line2[j][0] == '<' && line1[j][0] == '<')
             {
-                if (output.empty()) output = unknown;
-                else output += ' ' + unknown;
+                // kolla först om båda finns, sen om ena finns och typ restart = true om ingen finns?
+                if (patterns1.count(line1[j]) == true) {
+                    if (patterns2.count(line2[j]) == true) {
+                        if (patterns2[line2[j]] != patterns1[line1[j]]) {
+                            output = '-';
+                            break;
+                        } else {
+                            // hit vill vi komma efter restart
+                            output = patterns2[line2[j]];
+                        }
+                    } else {
+                        // we only know patterns1[line1[j]]
+                        patterns2[line2[j]] = patterns1[line1[j]];
+                        if (output.empty()) output = patterns1[line1[j]];
+                        else output += ' ' + patterns1[line1[j]];
+                    }
+                }
+                else if (patterns2.count(line2[j]) == true)
+                {
+                    // only here if pattern1.count isn't true
+                    patterns1[line1[j]] = patterns2[line2[j]];
+                    if (output.empty()) output = patterns2[line2[j]];
+                    else output += ' ' + patterns2[line2[j]];
+                    restart = true;
+                }
+                else {
+                    // vi känner inte till nån
+                    if (output.empty()) output = unknown;
+                    else output += ' ' + unknown;
+                    restart = true;
+                }
+            }
+            if (j == line1.size() - 1 && restart)
+            {
+                j = 0;
+                restart = false;
+                output = "";
             }
         }
         std::cout << output << '\n';
