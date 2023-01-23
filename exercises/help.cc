@@ -61,6 +61,9 @@ int main() {
                 {
                     if (output.empty()) output = line2[j];
                     else output += ' ' + line2[j];
+                } else {
+                    output = '-';
+                    break;
                 }
             }
             else if (line2[j][0] == '<' && line1[j][0]!= '<')

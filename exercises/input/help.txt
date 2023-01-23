@@ -1,1 +1,1 @@
-6how now brown <animal><foo> now <color> cowwho are you<a> <b> <a><a> bc <a><a><a><a> <b> <a><j> <j> k<a> c <a><j> <j> k
+7how now brown <animal><foo> now <color> cowwho are you<a> <b> <a><a> bc <a><a><a><a> <b> <a><j> <j> k<a> c <a><j> <j> k<a> a <a>b a c
