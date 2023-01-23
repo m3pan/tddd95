@@ -7,7 +7,7 @@
 int main() {
 
     /* Reading input from file? Set delimiter in getline() to '\r'
-     * Reading input from terminal? Set delimiter in getline() to '\n' (default)
+     * Reading input from terminal or submitting? Set delimiter in getline() to '\n' (default)
      *
      * nr: number of inputs
      * lines: a nested vector with the input sentences, each word or placeholder stored separately
@@ -48,7 +48,9 @@ int main() {
         std::map<std::string, std::string> patterns1;
         std::map<std::string, std::string> patterns2;
 
-        for (int j = 0; j < line1.size(); j++)
+        int length = std::max(line1.size(), line2.size());
+
+        for (int j = 0; j < length; j++)
         {
             if (line1[j][0] == '<' && line2[j][0]!= '<')
             {
@@ -110,7 +112,8 @@ int main() {
                             break;
                         } else {
                             // hit vill vi komma efter restart
-                            output = patterns2[line2[j]];
+                            if (output.empty()) output = patterns2[line2[j]];
+                            else output += ' ' + patterns2[line2[j]];
                         }
                     } else {
                         // we only know patterns1[line1[j]]
@@ -132,9 +135,9 @@ int main() {
                     restart  = true;
                 }
             }
-            if (j == line1.size() - 1 && restart)
+            if (j == length - 1 && restart)
             {
-                if (nrOfRestarts > line1.size())
+                if (nrOfRestarts > length)
                 {
                     // We've definitely restarted this process enough times now :)
                     break;
