@@ -18,7 +18,7 @@ int main() {
 
     int nr;
     std::string nr_st;
-    std::getline (std::cin, nr_st, '\r');
+    std::getline (std::cin, nr_st, '\n');
     std::stringstream ss(nr_st);
     ss >> nr;
 
@@ -28,7 +28,7 @@ int main() {
 
     for (int i = 0; i < 2*nr; i++)
     {
-        std::getline (std::cin, line, '\r');
+        std::getline (std::cin, line, '\n');
         std::istringstream iss_string(line);
         std::vector <std::string> lineVec;
 
@@ -36,11 +36,11 @@ int main() {
         lines.push_back(lineVec);
     }
 
-    int restart = false;
-    int nrOfRestarts = 0;
 
     for (int i = 0; i < 2*nr; i = i+2)
     {
+        int restart = false;
+        int nrOfRestarts = 0;
         std::vector<std::string> line1 = lines[i];
         std::vector<std::string> line2 = lines[i + 1];
         std::string output;
