@@ -18,7 +18,7 @@ int main() {
 
     int nr;
     std::string nr_st;
-    std::getline (std::cin, nr_st, '\n');
+    std::getline (std::cin, nr_st, '\r');
     std::stringstream ss(nr_st);
     ss >> nr;
 
@@ -28,7 +28,7 @@ int main() {
 
     for (int i = 0; i < 2*nr; i++)
     {
-        std::getline (std::cin, line, '\n');
+        std::getline (std::cin, line, '\r');
         std::istringstream iss_string(line);
         std::vector <std::string> lineVec;
 
@@ -44,6 +44,10 @@ int main() {
         std::vector<std::string> line1 = lines[i];
         std::vector<std::string> line2 = lines[i + 1];
         std::string output;
+        if (line1.size() != line2.size()) {
+            std::cout << "-" << std::endl;
+            continue;
+        }
 
         std::map<std::string, std::string> patterns1;
         std::map<std::string, std::string> patterns2;
