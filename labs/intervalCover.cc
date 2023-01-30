@@ -5,8 +5,8 @@
 
  struct interval
 {
-    float d1;
-    float d2;
+    double d1;
+    double d2;
     int i;
 };
 bool compareIntervals(const interval &lhs, const interval &rhs)
@@ -14,16 +14,14 @@ bool compareIntervals(const interval &lhs, const interval &rhs)
     return lhs.d1 < rhs.d1;
 }
 
-std::vector <interval> cover(float A, float B, std::vector <interval> intervalSet);
+std::vector <interval> cover(double A, double B, std::vector <interval> intervalSet);
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
     std::string AB_st;
-    float A, B;
+    double A, B;
 
     while(std::getline (std::cin, AB_st, '\n')) //!! never stops with terminal input
     {
-        std::cout << "\nnew interval: " << "\n";
         std::stringstream ss1(AB_st);
         ss1 >> A; ss1 >> B;
 
@@ -50,18 +48,25 @@ int main() {
         }
 
         std::vector <interval> result = cover(A, B, lines);
-        for (interval r : result)
-        {
-            std::cout << r.i << " ";
+        if (result[0].d1 == -1) {
+            std::cout << "impossible" << "\n";
+            continue;
+        } else {
+            std::cout << result.size() << "\n";
+            for (interval r : result)
+            {
+                std::cout << r.i << " ";
+            }
+            std::cout << "\n";
         }
     }
     return 0;
 }
 
-std::vector <interval> cover(float A, float B, std::vector <interval> intervalSet)
+std::vector <interval> cover(double A, double B, std::vector <interval> intervalSet)
 {
     std::sort(intervalSet.begin(), intervalSet.end(), compareIntervals);
-    float limit = A;
+    double limit = A;
     std::vector <interval> chosenSet;
 
     interval curr_interval;
@@ -111,9 +116,7 @@ std::vector <interval> cover(float A, float B, std::vector <interval> intervalSe
             }
             // auto next = *(&interval + 1);
         }
-
         if (limit >= B) break;
     }
-
     return chosenSet;
 }
