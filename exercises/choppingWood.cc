@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 // TODO: Change from copying to &references
 std::vector<int> determineUColumn(std::vector <int> vColumn);
@@ -44,19 +45,21 @@ int main() {
 
 std::vector<int> determineUColumn(std::vector <int> vColumn) {
     // Count degree for all nodes
-    std::vector<int> degrees(*max_element(vColumn.begin(), vColumn.end()));
-    std::vector<bool> degreesPicked(*max_element(vColumn.begin(), vColumn.end()));
+
+    std::vector<int> degrees(*std::max_element(vColumn.begin(), vColumn.end()));
+
     std::vector<int> vColumnSorted(vColumn.size());
     std::copy(vColumn.begin(), vColumn.end(), vColumnSorted.begin());
     std::sort(vColumnSorted.begin(), vColumnSorted.end(), returnSmallest);
+
     for (int node : vColumnSorted)
     {
         degrees[node - 1] += 1;
     }
 
     // Pick lowest valued node with degree zero that has not been cut and cut it, update d accordingly
-    long index{};
-    std::vector<int> result{};
+    long index = 0;
+    std::vector<int> result;
     for (int i = 0; i < vColumn.size(); i++)
     {
         // todo: use range based for loop instead
