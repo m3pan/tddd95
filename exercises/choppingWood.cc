@@ -5,7 +5,7 @@
 #include <queue>
 
 // TODO: Change from copying to &references
-std::vector<int> determineUColumn(int nrOfInputs, std::vector <int> vColumn);
+void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <int> degrees);
 
 bool returnSmallest(const int &lhs, const int &rhs)
 {
@@ -14,66 +14,62 @@ bool returnSmallest(const int &lhs, const int &rhs)
 
 int main() {
     int nrOfInputs;
-    std::string nrString;
-    std::getline (std::cin, nrString, '\n');
-    std::stringstream ss(nrString);
-    ss >> nrOfInputs;
-
-    std::string line;
+    std::cin >> nrOfInputs;
     int integer;
-    std::vector <int> vColumn;
+    std::vector <int> vColumn(nrOfInputs);
+    std::vector<int> degrees(nrOfInputs + 1);
+    //std::priority_queue<int> degrees;
 
+// insertsort
     for (int i = 0; i < nrOfInputs; i++)
     {
-        std::getline (std::cin, line, '\n');
-        std::istringstream iss_string(line);
-        iss_string >> integer;
-        vColumn.push_back(integer);
+        std::cin >> integer;
+        vColumn[i] = (integer);
+        degrees[integer - 1] += 1;
     }
-    std::vector<int> result = determineUColumn(nrOfInputs, vColumn);
-    if (result.empty())
-    {
-        std::cout << "Error" << "\n";
-    } else {
-        for (int r : result){
-            std::cout << r << std::endl;
-        }
-    }
+    determineUColumn(nrOfInputs, vColumn, degrees);
     return 0;
 }
 
-std::vector<int> determineUColumn(int nrOfInputs, std::vector <int> vColumn) {
+void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <int> degrees) {
     std::vector<int> result;
     // Count degree for all nodes
     if (vColumn[nrOfInputs - 1] != nrOfInputs + 1)
     {
-        return result;
+        std::cout << "Error" << "\n";
+        return;
     }
-    std::vector<int> degrees(nrOfInputs);
-    //std::priority_queue<int> degrees;
+    // std::vector<int> degrees(nrOfInputs);
+    std::priority_queue<int> pq_degrees;
+    if (degrees[vColumn[0] - 1] != 0) {--degrees[vColumn[0] -1]; }
 
-    std::vector<int> vColumnSorted(nrOfInputs);
-    std::copy(vColumn.begin(), vColumn.end(), vColumnSorted.begin());
-    std::sort(vColumnSorted.begin(), vColumnSorted.end(), returnSmallest);
-
-    for (int node : vColumnSorted)
+    for (int i = 0; i < degrees.size(); i++)
     {
-        degrees[node - 1] += 1;
-    }
-
-    // Pick lowest valued node with degree zero that has not been cut and cut it, update d accordingly
-    long index = 0;
-    for (int i = 0; i < nrOfInputs; i++)
-    {
-        // todo: use range based for loop instead
-        // todo: change so that the 'last element' is N+1
-        auto itr = std::find( degrees.begin(), degrees.end(), 0 );
-        if (itr != degrees.cend()) {
-            index = std::distance(degrees.begin(), itr);
-            degrees[index] = -1;
-            if (degrees[vColumn[i] - 1]) {--degrees[vColumn[i] - 1];}
-            result.push_back(index + 1);
+        if (degrees[i] == 0)
+        {
+            pq_degrees.push((-i-1));
+            degrees[i] = -43;
         }
     }
-    return result;
+    if (!pq_degrees.empty()) {
+        std::cout << (-1) * pq_degrees.top() << '\n';
+        pq_degrees.pop();
+    }
+    for (int j = 1; j < nrOfInputs; j++)
+    {
+        if (!pq_degrees.empty()) {
+            std::cout << (-1) * pq_degrees.top() << '\n';
+            pq_degrees.pop();
+        }
+        if (degrees[vColumn[j] - 1])
+        {
+            --degrees[vColumn[j] - 1];
+            if (degrees[vColumn[j] - 1] == 0)
+            {
+                pq_degrees.push(-vColumn[j]);
+                degrees[vColumn[j] - 1] = -43;
+            }
+        }
+
+    }
 }
