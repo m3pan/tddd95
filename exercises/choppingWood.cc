@@ -20,7 +20,7 @@ int main() {
     std::vector<int> degrees(nrOfInputs + 1);
     //std::priority_queue<int> degrees;
 
-// insertsort
+    // Read input data and count the node degrees
     for (int i = 0; i < nrOfInputs; i++)
     {
         std::cin >> integer;
@@ -33,24 +33,30 @@ int main() {
 
 void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <int> degrees) {
     std::vector<int> result;
-    // Count degree for all nodes
+    // A solution is not possible if the last input isn't the highest node
     if (vColumn[nrOfInputs - 1] != nrOfInputs + 1)
     {
         std::cout << "Error" << "\n";
         return;
     }
-    // std::vector<int> degrees(nrOfInputs);
+    // Initialization
     std::priority_queue<int> pq_degrees;
-    if (degrees[vColumn[0] - 1] != 0) {--degrees[vColumn[0] -1]; }
 
+    // Decrease first element
+    if (degrees[vColumn[0] - 1] != 0)
+    {
+        --degrees[vColumn[0] -1];
+    }
     for (int i = 0; i < degrees.size(); i++)
     {
+        // Add all zero elements to
         if (degrees[i] == 0)
         {
             pq_degrees.push((-i-1));
             degrees[i] = -43;
         }
     }
+
     if (!pq_degrees.empty()) {
         std::cout << (-1) * pq_degrees.top() << '\n';
         pq_degrees.pop();
