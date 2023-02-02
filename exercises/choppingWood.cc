@@ -1,16 +1,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <algorithm>
 #include <queue>
 
-// TODO: Change from copying to &references
 void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <int> degrees);
-
-bool returnSmallest(const int &lhs, const int &rhs)
-{
-    return lhs < rhs;
-}
 
 int main() {
     int nrOfInputs;
@@ -18,7 +11,6 @@ int main() {
     int integer;
     std::vector <int> vColumn(nrOfInputs);
     std::vector<int> degrees(nrOfInputs + 1);
-    //std::priority_queue<int> degrees;
 
     // Read input data and count the node degrees
     for (int i = 0; i < nrOfInputs; i++)
@@ -39,17 +31,13 @@ void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <in
         std::cout << "Error" << "\n";
         return;
     }
-    // Initialization
+    // Solve problem by using this strategy:
+    // Pick lowest-valued node with degree zero that has not been cut, and cut it and update d accordingly
     std::priority_queue<int> pq_degrees;
 
-    // Decrease first element
-    if (degrees[vColumn[0] - 1] != 0)
-    {
-        --degrees[vColumn[0] -1];
-    }
+    // Begin  by adding all zero degrees to the queue
     for (int i = 0; i < degrees.size(); i++)
     {
-        // Add all zero elements to
         if (degrees[i] == 0)
         {
             pq_degrees.push((-i-1));
@@ -57,11 +45,7 @@ void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <in
         }
     }
 
-    if (!pq_degrees.empty()) {
-        std::cout << (-1) * pq_degrees.top() << '\n';
-        pq_degrees.pop();
-    }
-    for (int j = 1; j < nrOfInputs; j++)
+    for (int j = 0; j < nrOfInputs; j++)
     {
         if (!pq_degrees.empty()) {
             std::cout << (-1) * pq_degrees.top() << '\n';
@@ -76,6 +60,5 @@ void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <in
                 degrees[vColumn[j] - 1] = -43;
             }
         }
-
     }
 }
