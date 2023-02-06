@@ -24,6 +24,7 @@ int main() {
 }
 
 void determineUColumn(int nrOfInputs, std::vector <int> vColumn, std::vector <int> degrees) {
+    // Timecomplexity: O(n log n)
     std::vector<int> result;
     // A solution is not possible if the last input isn't the highest node
     if (vColumn[nrOfInputs - 1] != nrOfInputs + 1)
