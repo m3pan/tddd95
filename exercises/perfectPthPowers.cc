@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <sstream>
 
 // m^k = n
 // primtalsfaktorisera och kolla om man kan skriva talet som multipel av ett och samma tal ?
@@ -10,43 +11,46 @@
 void determineP(int input);
 
 int main() {
-    int nrOfInputs;
-    std::cin >> nrOfInputs;
-    std::cout << "\n";
-    std::cout << "\n";
-    int integer;
-    std::vector <int> input(nrOfInputs);
 
-    // Read input data and count the node degrees
-    for (int i = 0; i < nrOfInputs; i++)
+    std::string inputString;
+    int integer;
+
+    while(std::getline (std::cin, inputString, '\n')) //!! never stops with terminal input
     {
-        std::cin >> integer;
-        std::cout << "\n";
+        std::stringstream ss(inputString);
+        ss >> integer;
         determineP(integer);
     }
+
     return 0;
 }
 void determineP(int input)
 {
+    if (input < 2)
+    {
+        return;
+    }
     if (input < 4)
     {
-        std::cout << "\n";
-    }
+        std::cout << 1 << "\n";
+        return;
+    } /*
     double squareroot = sqrt(input);
     if (squareroot == floor(squareroot))
     {
-        std::cout << squareroot;
+        std::cout << 2;
         return;
-    }
+    }*/
     double k{};
-    for (int m = 2; m <= input/2; m--) {
+    for (int m = 2; m <= input/2; ++m) {
         k = (log(input) / log(m));
         if (k == floor(k))
         {
-            std::cout << k;
+            std::cout << k << "\n";
             return;
         }
     }
+    std::cout << 1 << "\n";
     return;
 
 
