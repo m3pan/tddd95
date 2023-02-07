@@ -22,6 +22,7 @@ int main() {
 
     while(std::getline (std::cin, AB_st, '\n')) //!! never stops with terminal input
     {
+        if (AB_st.empty()) {break;}
         std::stringstream ss1(AB_st);
         ss1 >> A; ss1 >> B;
 
