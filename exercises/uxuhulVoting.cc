@@ -71,10 +71,10 @@ void uxuhulVoting(int votingPriests, int currPriest, const std::vector<std::vect
     std::map<int, int> comprehensiveMap{};
 
 
-    int remainingPriests = votingPriests - currPriest;
-    std::vector<int> possiblePref{}; // our output
-    std::map<int, int> preferredOutputs{};  // {input : output}
     for (int priest = votingPriests; priest > 0; priest--) {
+        int remainingPriests = votingPriests - currPriest;
+        std::vector<int> possiblePref{}; // our output
+        std::map<int, int> preferredOutputs{};  // {input : output}
         // determine what states the priest could get
         std::unordered_map<int, int> inputStates;
         std::unordered_map<int, int> outputStates;
@@ -116,8 +116,10 @@ void uxuhulVoting(int votingPriests, int currPriest, const std::vector<std::vect
             // Determine possible outputs for each input, {score : output}. The map is sorted based on score
             std::map<int, int> possibleOutputs{};
             for (outputIt = outputStates.begin(); outputIt != inputStates.end(); outputIt++) {
-                if (countStoneFlips(inputIt->second, outputIt->second) == 1) {
-                    possibleOutputs.insert({preferences[priest-1][outputIt->first], outputIt->first});
+                if (priest == 1 && countStoneFlips(inputIt->second, outputIt->second) == 1) {
+                    possibleOutputs.insert({preferences[priest-1][outputIt->first-1], outputIt->first});
+                } else if (countStoneFlips(inputIt->second, outputIt->second) == 1) {
+                    possibleOutputs.insert({preferences[priest-2][outputIt->first-1], outputIt->first});
                     // bestäm outputIt->second värde och lägg i en lista
                     // std::cout << preferences[priest-1][outputIt->first] << std::endl;
                     // Skapa en map från inputIt till outputIt
