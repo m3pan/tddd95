@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <tuple>
+
 
 void gettingGold(std::tuple<int,int> position, std::vector<std::vector <char>> (*maze));
 
