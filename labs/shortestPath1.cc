@@ -2,6 +2,7 @@
 #include <sstream>
 #include <vector>
 #include <utility>  //  std::pair
+#include <set>
 
 /* Implement Dijkstras algorithm to find the shortest path from one node to all other nodes in a graph with
  * non-negative edge weights.
@@ -26,13 +27,16 @@
 1
 0 0 0 0 */
 
-// todo: implement the sparse algorithm instead!
+struct distancePredecessors{
+    std::vector<int> distance;
+    std::vector<int> predecessors;
+};
+
 
 int inf = 10000000;
 
-std::vector<int> shortestPath(std::vector<std::vector<std::pair<int, int>>> adjacent, int startingNode,
-                              std::vector<std::vector<int>> queries, std::vector<int> & distance,
-                              std::vector<int> & predecessors);
+distancePredecessors shortestPath(std::vector<std::vector<std::pair<int, int>>> adjacent, int startingNode,
+                                  std::vector<int> & distance, std::vector<int> & predecessors);
 
 int main() {
 
@@ -67,8 +71,14 @@ int main() {
             ss2 >> w;
             std::pair<int, int> edge{v, w};
 
-            adjacent[edgeVec[0]].push_back(edge);
+            adjacent[edgeVec[0]].push_back(edge);   // todo: kolla varför det blir fel här
         }
+        std::vector<int> distance{};
+        std::vector<int> predecessors{};
+        distancePredecessors returnValue{};
+        returnValue  = shortestPath(adjacent, startingNode, distance, predecessors);
+
+        // no need to store queries, just print returnvalues
 
         std::vector<std::vector<int>> queries{};
         for (int q = 0; q < nrQueries; q++)
@@ -83,17 +93,13 @@ int main() {
                 queriesVec.push_back(input);
             }
             //queries.push_back(queriesVec);
-            std::vector<int> distance{};
-            std::vector<int> predecessors{};
-            result  = shortestPath(adjacent, startingNode, queries, distance, predecessors);
         }
     }
     return 0;
 }
 
-std::vector<int> shortestPath(std::vector<std::vector<std::pair<int, int>>> adjacent, int startingNode,
-                              std::vector<std::vector<int>> queries, std::vector<int> & distance,
-                              std::vector<int> & predecessors)
+distancePredecessors shortestPath(std::vector<std::vector<std::pair<int, int>>> adjacent, int startingNode,
+                              std::vector<int> & distance, std::vector<int> & predecessors)
 {
     /*
      * std::vector<int> distance : for each vertex v, we store the current shortest path from s to v
@@ -109,36 +115,31 @@ std::vector<int> shortestPath(std::vector<std::vector<std::pair<int, int>>> adja
     predecessors.assign(nrNodes, -1);
 
     // A boolean array u[] which stores for each vertex v whether it's marked
-    std::vector<bool> markedVertices(nrNodes, false);
+    // std::vector<bool> markedVertices(nrNodes, false);
 
     distance[startingNode] = 0;
 
-    for (int i = 0; i < nrNodes; i++)
+    std::set<std::pair<int, int>> queue;
+    queue.insert({0, startingNode});
+
+    while (!queue.empty())
     {
-        /* At each iteration the vertex v is selected which has the smallest distance d[v] among all the unmarked values
-         *
-         *
-         * */
+        int v = queue.begin()->second;
+        queue.erase(queue.begin());
 
-        // The selected vertex which has the smallest distance to the vertex i
-        int v = -1;
+        for (auto edge : adjacent[v]) {
+            int to = edge.first;
+            int len = edge.second;
 
-        for (int j = 0; j < nrNodes; j++)
-        {
-            if (!markedVertices[j] && (v == -1 || distance[j] < distance[v]))
-            {
-                v = j;
+            if (distance[v] + len < distance[to]) {
+                queue.erase({distance[to], to});
+                distance[to] = distance[v] + len;
+                predecessors[to] = v;
+                queue.insert({distance[to], to});
             }
         }
-
-        if (distance[v] == inf) break;
-
-        //
-        markedVertices[v] = true;
-
-        for (auto edge : adjacent[v])
-        {
-        }
     }
+    return distancePredecessors{distance, predecessors};
+
 }
 
