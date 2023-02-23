@@ -14,24 +14,10 @@
  * Är vår graf sparse?
  * */
 
-/* 4 3 4 0
-0 1 2
-1 2 2
-3 0 2
-0
-1
-2
-3
-2 1 1 0
-0 1 100
-1
-0 0 0 0 */
-
 struct distancePredecessors{
     std::vector<int> distance;
     std::vector<int> predecessors;
 };
-
 
 int inf = 10000000;
 
@@ -48,52 +34,63 @@ int main() {
     std::string readLine{};
 
     while (std::getline(std::cin, readLine, '\n')) {
-        if (readLine == "0 0 0 0") break;
+        if (readLine == "")
+        {
+            std::getline(std::cin, readLine, '\n');
+            if (readLine == "0 0 0 0")
+            {
+                break;
+            }
+        }
         std::stringstream ss1{readLine};
         ss1 >> nrNodes;
         ss1 >> nrEdges;
         ss1 >> nrQueries;
         ss1 >> startingNode;
-        std::vector<std::vector<std::pair<int, int>>> adjacent{};
+        std::vector<std::vector<std::pair<int, int>>> adjacent(nrNodes);
         std::vector<int> result{};
+        std::vector<std::pair<int, int>> edgeVec{};
+        int u{};
         for (int m = 0; m < nrEdges; m++)
         {
-            std::vector<int> edgeVec{};
             std::getline(std::cin, readLine, '\n');
             std::stringstream ss2{readLine};
-
+            int cmp{};
+            ss2 >> cmp;
+            if (cmp != u)
+            {
+                adjacent[u] = edgeVec;
+                edgeVec = {};
+            }
             // Read input line consisting of [u v w] = [startNode endNode weight]
-            int u{};
+            u = cmp;
             int v{};
             int w{};
-            ss2 >> u;
             ss2 >> v;
             ss2 >> w;
             std::pair<int, int> edge{v, w};
-
-            adjacent[edgeVec[0]].push_back(edge);   // todo: kolla varför det blir fel här
+            edgeVec.push_back(edge);
         }
+        adjacent[u] = edgeVec;
         std::vector<int> distance{};
         std::vector<int> predecessors{};
         distancePredecessors returnValue{};
         returnValue  = shortestPath(adjacent, startingNode, distance, predecessors);
 
         // no need to store queries, just print returnvalues
-
-        std::vector<std::vector<int>> queries{};
+        int q{};
+        int output{};
         for (int q = 0; q < nrQueries; q++)
         {
-            std::vector<int> queriesVec{};
-            std::getline(std::cin, readLine, '\n');
-            std::stringstream ss3{readLine};
-            for (int j = 0; j < 3; j++)
+            std::cin >> q;
+            if (returnValue.distance[q] == inf)
             {
-                int input{};
-                ss3 >> input;
-                queriesVec.push_back(input);
+                std::cout << "Impossible" << std::endl;
+            } else {
+                std::cout << returnValue.distance[q] << std::endl;
             }
-            //queries.push_back(queriesVec);
         }
+
     }
     return 0;
 }
@@ -124,22 +121,24 @@ distancePredecessors shortestPath(std::vector<std::vector<std::pair<int, int>>> 
 
     while (!queue.empty())
     {
-        int v = queue.begin()->second;
+        int currNode = queue.begin()->second;
         queue.erase(queue.begin());
 
-        for (auto edge : adjacent[v]) {
+        for (auto edge : adjacent[currNode]) {
+            // iterate over edges in the edge vector
             int to = edge.first;
-            int len = edge.second;
+            int weight = edge.second;
 
-            if (distance[v] + len < distance[to]) {
+            if (distance[currNode] + weight < distance[to]) {
+                // if we've found a new shortest path with out edge
                 queue.erase({distance[to], to});
-                distance[to] = distance[v] + len;
-                predecessors[to] = v;
+                distance[to] = distance[currNode] + weight;
+                // store the parent node
+                predecessors[to] = currNode;
                 queue.insert({distance[to], to});
             }
         }
     }
     return distancePredecessors{distance, predecessors};
-
 }
 
