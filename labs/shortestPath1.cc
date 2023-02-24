@@ -1,3 +1,18 @@
+/*
+ * Madeleine Nilsson
+ * madni264
+ * Solves the Single source shortest path (non-negative weights) using Dijkstras Algorithm. Given a
+ * startingNode it returns the shortest distance and predecessors to all nodes in the graph.
+ *
+ * The algorithm iterates over all edges and checks if it gives a new shortest distance to a node from our starting
+ * node. It stores a queue
+ *
+ * */
+
+
+
+
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -41,7 +56,11 @@ int main() {
             {
                 break;
             }
+            else {
+                std::cout << "\n";
+            }
         }
+
         std::stringstream ss1{readLine};
         ss1 >> nrNodes;
         ss1 >> nrEdges;
@@ -49,7 +68,7 @@ int main() {
         ss1 >> startingNode;
         std::vector<std::vector<std::pair<int, int>>> adjacent(nrNodes);
         std::vector<int> result{};
-        std::vector<std::pair<int, int>> edgeVec{};
+        // std::vector<std::pair<int, int>> edgeVec{};
         int u{};
         for (int m = 0; m < nrEdges; m++)
         {
@@ -57,11 +76,7 @@ int main() {
             std::stringstream ss2{readLine};
             int cmp{};
             ss2 >> cmp;
-            if (cmp != u)
-            {
-                adjacent[u] = edgeVec;
-                edgeVec = {};
-            }
+
             // Read input line consisting of [u v w] = [startNode endNode weight]
             u = cmp;
             int v{};
@@ -69,25 +84,22 @@ int main() {
             ss2 >> v;
             ss2 >> w;
             std::pair<int, int> edge{v, w};
-            edgeVec.push_back(edge);
+            adjacent[u].push_back(edge);
         }
-        adjacent[u] = edgeVec;
         std::vector<int> distance{};
         std::vector<int> predecessors{};
-        distancePredecessors returnValue{};
-        returnValue  = shortestPath(adjacent, startingNode, distance, predecessors);
+        distancePredecessors returnValues{};
+        returnValues  = shortestPath(adjacent, startingNode, distance, predecessors);
 
-        // no need to store queries, just print returnvalues
-        int q{};
-        int output{};
+        int q1{};
         for (int q = 0; q < nrQueries; q++)
         {
-            std::cin >> q;
-            if (returnValue.distance[q] == inf)
+            std::cin >> q1;
+            if (returnValues.distance[q1] == inf)
             {
-                std::cout << "Impossible" << std::endl;
+                std::cout << "Impossible" << "\n";
             } else {
-                std::cout << returnValue.distance[q] << std::endl;
+                std::cout << returnValues.distance[q1] << std::endl;
             }
         }
 
