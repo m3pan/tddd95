@@ -4,6 +4,7 @@
 #include <tuple>
 
 std::vector<std::vector<std::pair<int, int>>> graph{};
+void fullTank(std::vector<std::vector<std::pair<int, int>>> &graph, int startingCity, int goalCity, int fuelCapacity);
 
 int main(){
     int nrCities{};     // n
@@ -45,7 +46,13 @@ int main(){
             // or “impossible” if there is no way of getting from s to e with the given car.
             int startingCity, goalCity, fuelCapacity;
             std::cin >> startingCity >> goalCity >> fuelCapacity;
+            fullTank(graph, startingCity, goalCity, fuelCapacity);
         }
 
     }
+}
+
+void fullTank(std::vector<std::vector<std::pair<int, int>>> &graph, int startingCity, int goalCity, int fuelCapacity)
+{
+
 }
