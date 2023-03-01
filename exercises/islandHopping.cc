@@ -1,47 +1,42 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <utility>
 #include <queue>
 #include <cmath>
+#include <iomanip>
 
-void islandHopping(int nrIslands, std::vector<std::pair<float, float>> coordinates);
+double islandHopping(int nrIslands, std::vector<std::pair<float, float>> coordinates);
 
 
-
-std::vector<int> parent, rank;
-
-void make_set(int v) {
-    parent[v] = v;
-    rank[v] = 0;
-}
-
-int find_set(int v) {
+int findParent(int v, std::vector<int> &parent, std::vector<int> &rank) {
     if (v == parent[v])
         return v;
-    return parent[v] = find_set(parent[v]);
+    return parent[v] = findParent(parent[v], parent, rank);
 }
 
-void union_sets(int a, int b) {
-    a = find_set(a);
-    b = find_set(b);
+void unionSets(int a, int b, std::vector<int> &parent, std::vector<int> &rank)
+{
+    a = findParent(a, parent, rank);
+    b = findParent(b, parent, rank);
     if (a != b) {
+
+        // larger rank -> set as parent
+        if (rank[a] > rank[b])
+        {
+            parent[b] = a;
+            rank[a] += 1;
+        } else {
+            parent[a] = b;
+            rank[b] += 1;
+        }
+        /*
         if (rank[a] < rank[b])
             std::swap(a, b);
         parent[b] = a;
         if (rank[a] == rank[b])
-            rank[a]++;
+            rank[a]++;*/
     }
 }
-/*
-struct Edge {
-    int u, v, weight;
-    bool operator<(Edge const& other) {
-        return weight < other.weight;
-    }
-};
-
-*/
 
 int main(){
     int nrCases{};        // n
@@ -61,16 +56,32 @@ int main(){
             std::cin >> input.first >> input.second;
             coordinates.push_back(input);
         }
-        islandHopping(nrIslands, coordinates);
+        double result = islandHopping(nrIslands, coordinates);
         --nrCases;
+
+        /*for (std::tuple<float, int, int> r : result)
+        {
+            resultValue += std::get<0>(r);
+        }*/
+        std::cout << std::setprecision(9) << result << "\n";
     }
     return 0;
 }
 
-void islandHopping(int nrIslands, std::vector<std::pair<float, float>> coordinates)
+double islandHopping(int nrIslands, std::vector<std::pair<float, float>> coordinates)
 {
-    // create all edges
+    std::vector<int> parent(nrIslands);
+    std::vector<int> rank(nrIslands);       // hur djupt i vårt träd vi är
 
+
+    // create all nodes
+    for (int i = 0; i < nrIslands; i++)
+    {
+        parent[i] = i;
+        rank[i] = 1;
+    }
+
+    // create all edges
     // sort all edges of the graph in non-decreasing order of the weights
     std::priority_queue<std::tuple<float, int, int>> edges;
     for (int i = 0; i < nrIslands; i++)
@@ -82,34 +93,29 @@ void islandHopping(int nrIslands, std::vector<std::pair<float, float>> coordinat
         {
             float x2 = coordinates[j].first;
             float y2 = coordinates[j].second;
-
-            float distance = pow(pow(x1-x2, 2) + pow(y1-y2, 2), 0.5);
-            edges.push({distance, i, j});
+            double distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+            //double distance = pow(pow(x1-x2, 2) + pow(y1-y2, 2), 0.5);
+            edges.push({-distance, i, j});
         }
     }
-
     // put each island in its own tree
-    /*
-    int n;
-    std::vector<Edge> edges;
 
-    int cost = 0;
-    std::vector<Edge> result;
-    parent.resize(n);
-    rank.resize(n);
-    for (int i = 0; i < n; i++)
+    double cost = 0;
+    std::vector<std::tuple<float, int, int>> result;
+
+    int nrEdges = edges.size();
+
+    for (int n = 0; n < nrEdges; n++)
     {
-        make_set(i);
-    }
+        std::tuple<float, int, int> top = edges.top();
 
-    std::sort(edges.begin(), edges.end());
-
-    for (Edge e : edges) {
-        if (find_set(e.u) != find_set(e.v)) {
-            cost += e.weight;
-            result.push_back(e);
-            union_sets(e.u, e.v);
+        if (findParent(std::get<1>(top), parent, rank) != findParent(std::get<2>(top), parent, rank))
+        {
+            cost += - std::get<0>(top);   // weight
+            result.push_back(top);
+            unionSets(std::get<1>(top), std::get<2>(top), parent, rank);
         }
+        edges.pop();
     }
-     */
+    return cost;
 }
