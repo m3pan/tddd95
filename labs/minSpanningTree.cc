@@ -3,6 +3,8 @@
 #include <utility>
 #include <queue>
 #include <sstream>
+#include <algorithm>
+
 
 struct minSpanTree{
     int minCost;
@@ -11,6 +13,27 @@ struct minSpanTree{
 
 minSpanTree minSpanningTree(int nrNodes, int nrEdges, std::priority_queue<std::tuple<int, int, int>> edges);
 
+
+bool compareEdges(const std::tuple<float, int, int> &lhs, const std::tuple<float, int, int> &rhs)
+{
+    if (std::get<1>(lhs) < std::get<1>(rhs))
+    {
+        return lhs < rhs;
+    } else if (std::get<1>(lhs) > std::get<1>(rhs))
+    {
+        return lhs > rhs;
+    } else {
+        // first node equal
+        if (std::get<2>(lhs) < std::get<2>(rhs))
+        {
+            return lhs < rhs;
+        } else if (std::get<2>(lhs) > std::get<2>(rhs))
+        {
+            return lhs > rhs;
+        }
+    }
+    return lhs < rhs;
+}
 
 int findParent(int v, std::vector<int> &parent, std::vector<int> &rank) {
     if (v == parent[v])
@@ -33,12 +56,6 @@ void unionSets(int a, int b, std::vector<int> &parent, std::vector<int> &rank)
             parent[a] = b;
             rank[b] += 1;
         }
-        /*
-        if (rank[a] < rank[b])
-            std::swap(a, b);
-        parent[b] = a;
-        if (rank[a] == rank[b])
-            rank[a]++;*/
     }
 }
 
@@ -46,11 +63,11 @@ int main(){
     std::string readLine{};
 
     while (std::getline(std::cin, readLine, '\n')) {
+        if (readLine == "0 0") {
+            break;
+        }
         if (readLine.empty()) {
             std::getline(std::cin, readLine, '\n');
-            if (readLine == "0 0 0 0") {
-                break;
-            }
         }
         std::stringstream ss1{readLine};
         int nrNodes;    // n
@@ -65,13 +82,19 @@ int main(){
             int u, v, w;
             std::cin >> u >> v >> w;
 
-            // todo: If u > v, swap u and v
+            if (u > v)
+            {
+                std::swap(u,v);
+            }
             std::tuple<int, int, int> edge = {-w, u, v};
             edges.push(edge);
         }
         minSpanTree result = minSpanningTree(nrNodes, nrEdges, edges);
 
-        if ((result.minEdges).size() != nrNodes - 1)
+        std::vector<std::tuple<float, int, int>> minEdges = result.minEdges;
+
+
+        if (minEdges.size() != nrNodes - 1)
         {
             std::cout << "Impossible" << "\n";
         } else {
@@ -80,7 +103,12 @@ int main(){
             std::cout << result.minCost << std::endl;
 
             // Sort all edges, first on [1] and then on [2]. Remember that the first entry is the weight with switched sign
+            std::sort(minEdges.begin(), minEdges.end(), compareEdges);
 
+            for (auto e : minEdges)
+            {
+                std::cout << std::get<1>(e) << " " << std::get<2>(e) << std::endl;
+            }
         }
     }
     return 0;
