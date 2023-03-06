@@ -7,68 +7,22 @@
 
 
 /*
- * A modified version of Dijkstras algorithm
+ * A modified version of Dijkstra's algorithm
+ *
+ * Traverse through all nodes in a graph with the maximum resulting factor.
  */
 
-double minSpanningTree(int nrNodes, int nrEdges, std::vector <std::vector <std::tuple<int, int, double>>> edges);
-
-bool compareEdges(const std::tuple<float, int, int> &lhs, const std::tuple<float, int, int> &rhs)
-{
-    if (std::get<1>(lhs) < std::get<1>(rhs))
-    {
-        return lhs < rhs;
-    } else if (std::get<1>(lhs) > std::get<1>(rhs))
-    {
-        return lhs > rhs;
-    } else {
-        // first node equal
-        if (std::get<2>(lhs) < std::get<2>(rhs))
-        {
-            return lhs < rhs;
-        } else if (std::get<2>(lhs) > std::get<2>(rhs))
-        {
-            return lhs > rhs;
-        }
-    }
-    return lhs < rhs;
-}
-
-int findParent(int v, std::vector<int> &parent, std::vector<int> &rank) {
-    if (v == parent[v])
-        return v;
-    return parent[v] = findParent(parent[v], parent, rank);
-}
-
-void unionSets(int a, int b, std::vector<int> &parent, std::vector<int> &rank)
-{
-    a = findParent(a, parent, rank);
-    b = findParent(b, parent, rank);
-    if (a != b) {
-
-        // larger rank -> set as parent
-        if (rank[a] > rank[b])
-        {
-            parent[b] = a;
-            rank[a] += 1;
-        } else {
-            parent[a] = b;
-            rank[b] += 1;
-        }
-    }
-}
-
+double modifiedDijkstra(int nrNodes, std::vector <std::vector <std::tuple<int, int, double>>> edges);
 
 
 int main()
 {
     std::ios::sync_with_stdio(false);
-    std::cin.tie(NULL);
-
-
-    // std::string readLine{};
+    std::cin.tie(nullptr);
 
     int nrIntersections{};      // n
     int nrCorridors{};          // m
+
     while (std::cin >> nrIntersections >> nrCorridors)
     {
         if (nrIntersections == 0 && nrCorridors == 0) break;
@@ -92,30 +46,28 @@ int main()
 
             dungeon[x].push_back(input);
         }
-        double fractionLeft = minSpanningTree(nrIntersections, nrCorridors, dungeon);
+        double fractionLeft = modifiedDijkstra(nrIntersections, dungeon);
 
-        std::cout << std::setprecision(3) << fractionLeft << '\n';
+        std::cout << std::fixed << std::setprecision(4) << fractionLeft << '\n';
 
     }
 }
 
-double minSpanningTree(int nrNodes, int nrEdges, std::vector <std::vector <std::tuple<int, int, double>>> edges) {
-    std::vector<int> parent(nrNodes);
-    std::vector<int> rank(nrNodes);
+double modifiedDijkstra(int nrNodes, std::vector <std::vector <std::tuple<int, int, double>>> edges) {
 
-    // Max fractions at each node
-    std::vector<double> maxFrac(nrNodes, 0);
+    // largest fractions at each node
+    std::vector<double> maxFractions(nrNodes, 0);
 
-    // current fraction and current node
-    std::priority_queue<std::pair<int, double>> unvisitedNodes;
+    // pq that sorts by fraction
+    std::priority_queue<std::pair<double, int>> unvisitedNodes;
 
-    unvisitedNodes.push({1.0, 0});
+    unvisitedNodes.push({1, 0});
 
     while (!unvisitedNodes.empty()) {
         std::pair<double, int> current = unvisitedNodes.top();
         unvisitedNodes.pop();
-        int currentNode = current.first;
-        double currentFraction = current.second;
+        int currentNode = current.second;
+        double currentFraction = current.first;
 
         if (currentNode == nrNodes - 1) return currentFraction;
 
@@ -123,11 +75,11 @@ double minSpanningTree(int nrNodes, int nrEdges, std::vector <std::vector <std::
 
         for (auto &neigh : edges[currentNode]) {
             // If fraction will be bigger than found
-            if (maxFrac[std::get<1>(neigh)] < currentFraction * std::get<2>(neigh)) {
-                maxFrac[std::get<1>(neigh)] = currentFraction * std::get<2>(neigh);
+            if (maxFractions[std::get<1>(neigh)] < currentFraction * std::get<2>(neigh)) {
+                maxFractions[std::get<1>(neigh)] = currentFraction * std::get<2>(neigh);
                 unvisitedNodes.push({currentFraction * std::get<2>(neigh), std::get<1>(neigh)});
             }
         }
     }
-    return -1;
+    return 0;
 }
