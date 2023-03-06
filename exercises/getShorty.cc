@@ -9,7 +9,8 @@
 /*
  * A modified version of Dijkstra's algorithm
  *
- * Traverse through all nodes in a graph with the maximum resulting factor.
+ * Traverse through all nodes in a graph with the maximum resulting factor. Undirected graph, so remember to add all
+ * edges in both directions to the graph container ("edges").
  */
 
 double modifiedDijkstra(int nrNodes, std::vector <std::vector <std::tuple<int, int, double>>> edges);
@@ -42,9 +43,12 @@ int main()
                 std::swap(x,y);
             }
 
-            std::tuple<int, int, double> input{x, y, f};
+            // Undirected graph => add the edges in both directions
+            std::tuple<int, int, double> input1{x, y, f};
+            std::tuple<int, int, double> input2{y, x, f};
 
-            dungeon[x].push_back(input);
+            dungeon[x].push_back(input1);
+            dungeon[y].push_back(input2);
         }
         double fractionLeft = modifiedDijkstra(nrIntersections, dungeon);
 
@@ -69,7 +73,11 @@ double modifiedDijkstra(int nrNodes, std::vector <std::vector <std::tuple<int, i
         int currentNode = current.second;
         double currentFraction = current.first;
 
-        if (currentNode == nrNodes - 1) return currentFraction;
+        if (currentNode == nrNodes - 1)
+        {
+            // Exit always located in node n-1
+            return currentFraction;
+        }
 
         // For each node, iterate over its neighbors
 
