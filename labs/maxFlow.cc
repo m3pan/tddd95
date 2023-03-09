@@ -2,7 +2,6 @@
 #include <vector>
 #include <utility>
 #include <queue>
-#include <sstream>
 #include <algorithm>
 
 
@@ -11,11 +10,11 @@ int INF = 100000;
 int bfs(int nrNodes, int nrEdges, int startNode, int endNode, std::vector <std::vector <int>> &dungeon,
         std::vector<std::vector<std::pair<int, int>*>> &capacityMatrix, std::vector<int>& parent) {
     /* Has augmenting path, return bool */
-    // reset parents
 
+    // Reset all parents
     std::fill(parent.begin(), parent.end(), -1);
     parent[startNode] = -2;
-    std::queue<std::pair<int, int>> q;      //!? what is queue
+    std::queue<std::pair<int, int>> q;
     q.push({startNode, INF});
 
     while (!q.empty()) {
@@ -26,7 +25,7 @@ int bfs(int nrNodes, int nrEdges, int startNode, int endNode, std::vector <std::
         for (int next : dungeon[cur]) {
             if (parent[next] == -1 && capacityMatrix[cur][next]) {
                 parent[next] = cur;
-                int new_flow = std::min(flow, *capacityMatrix[cur][next]);
+                int new_flow = std::min(flow, (*capacityMatrix[cur][next]).first);
                 if (next == endNode)
                     return new_flow;
                 q.push({next, new_flow});
@@ -49,13 +48,13 @@ int maxFlow(int nrNodes, int nrEdges, int startNode, int endNode, std::vector <s
     std::vector<int> parent(nrNodes);
     int new_flow;
 
-    while (new_flow = bfs(startNode, endNode, parent)) {
+    while (new_flow = bfs(nrNodes, nrEdges, startNode, endNode, dungeon, capacityMatrix, parent)) {
         flow += new_flow;
         int cur = endNode;
         while (cur != startNode) {
             int prev = parent[cur];
-            capacityMatrix[prev][cur] -= new_flow;
-            capacityMatrix[cur][prev] += new_flow;
+            (*capacityMatrix[prev][cur]).first -= new_flow;
+             (*capacityMatrix[cur][prev]).second += new_flow;
             cur = prev;
         }
     }
@@ -90,9 +89,12 @@ int main()
         dungeon[to].push_back(from);
 
         // Add a pointer to a capacity pair to the capacityMatris
-        std::pair<int, int> capacityPair = std::make_pair(c, 0);
-        std::pair<int, int> *capPtr = &capacityPair;
-        capacityMatrix[from][to] = capPtr;
+        // std::pair<int, int> capacityPair = std::make_pair(c, 0);
+        // std::pair<int, int> *capPtr = &capacityPair;
+
+        // std::auto_ptr<std::pair<int, int>> x(new std::make_pair(c, 0))
+        capacityMatrix[from][to] = new std::pair<int, int> (std::make_pair(c, 0));
+        capacityMatrix[to][from] = new std::pair<int, int> (std::make_pair(c, 0));
     }
 
     int result = maxFlow(nrNodes, nrEdges, startNode, endNode, dungeon, capacityMatrix);
