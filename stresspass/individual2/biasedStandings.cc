@@ -44,7 +44,7 @@ int biasedStandings(int nrTeams, std::vector<std::pair<std::string, int>> &teams
     // create all nodes
     for (int i = 0; i < nrTeams; i++)
     {
-        parent[i] = 1;
+        parent[i] = i;
         rank[i] = 1;
     }
 
