@@ -1,19 +1,18 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <unordered_map>
-#include <map>
 
 // Each suffix contains at most one ‘*’
 // Each position contains exactly one character
 
-std::string reconstruction(std::vector<std::string> &input, int const length){
+std::string reconstruction(int const length, int const nrSuffixes){
     std::string word(length, '#');
-    for (int suffixPos = 0; suffixPos < input.size(); suffixPos++){
-        // suffixposition = i + 1, själva inputen
-        std::string suffix = input[suffixPos];
+    std::string suffix;
+
+    for (int i = 0; i < nrSuffixes; i++){
+        // suffixposition = i + 1, själva inputen som vi läser in, nu på cin för att det kunde vara snabbare?
+        int suffixPos{};
+        std::cin >> suffixPos;
+        std::cin >> suffix;
+        suffixPos--;
 
         for (int j = 0; j < suffix.length(); ++j) {
             // iterate over each character in the suffix
@@ -32,12 +31,12 @@ std::string reconstruction(std::vector<std::string> &input, int const length){
             word[suffixPos + j] = suffix[j];
         }
 
+        }
         for (auto c : word) {
             if (c == '#') {
                 word = "IMPOSSIBLE";
                 break;
             }
-        }
     }
     return word;
 }
@@ -46,26 +45,56 @@ std::string reconstruction(std::vector<std::string> &input, int const length){
 int main(){
     std::ios::sync_with_stdio(false);
     std::cin.tie(NULL);
+    std::cout.tie(NULL);
+
     int nrTestCases{};
     std::cin >> nrTestCases;
-    for (int i = 0; i < nrTestCases; i++)
+    int length;
+    int nrSuffixes;
+    for (int i = 0; i < nrTestCases; ++i)
     {
-        int length;
-        std::cin >> length;
-        int suffixes;
-        std::cin >> suffixes;
-        std::vector<std::string> input(suffixes, "");
-        std::map<int, char> word;
-        for (int j = 0; j < suffixes; j++)
-        {
-            int position{};
-            std::cin >> position;
-            std::string suffix;
-            std::cin >> suffix;
-            input[position - 1] = suffix; // zero indexing
+        std::cin >> length >> nrSuffixes;
+
+        //!? reconstruction(), to avoid unnecessary function calls
+
+        std::string word(length, '#');
+        std::string suffix;
+        int suffixPos{};
+
+        for (int i = 0; i < nrSuffixes; ++i){
+            // suffixposition = i + 1, själva inputen som vi läser in, nu på cin för att det kunde vara snabbare?
+            std::cin >> suffixPos >> suffix;
+            --suffixPos;
+
+            for (int j = 0; j < suffix.length(); ++j) {
+                // iterate over each character in the suffix
+                if (suffix[j] == '*') {
+                    // hoppa över placeholders
+                    j = length - suffix.length() + 1;
+                    continue;
+                }
+                if (word[suffixPos + j] != '#')
+                {
+                    if (word[suffixPos + j] != suffix[j]){
+                        word = "IMPOSSIBLE";
+                        break;
+                    }
+                }
+                word[suffixPos + j] = suffix[j];
+            }
+
         }
-        std::string result = reconstruction(input, length);
-        std::cout << result << "\n";
+        for (auto c : word) {
+            if (c == '#') {
+                word = "IMPOSSIBLE";
+                break;
+            }
+        }
+
+
+
+
+        std::cout << word << "\n";
     }
     return 0;
 }
