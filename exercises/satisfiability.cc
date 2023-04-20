@@ -9,6 +9,7 @@
 #include <list>
 #include <numeric>
 #include <random>
+#include <set>
 
 bool isKthBitSet(int n, int k)
 {
@@ -19,14 +20,25 @@ bool isKthBitSet(int n, int k)
         return false;
 }
 
-void markBitStrings(std::vector<bool> &nBitStrings, std::vector<int> &subclauses){
+
+bool containsAllValuesUpToN(const std::set<int>& s, int n) {
+    for (int i = 0; i <= n; ++i) {
+        if (s.find(i) == s.end()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+std::vector<int> markBitStrings(std::vector<bool> &nBitStrings, std::vector<int> &subclauses){
     std::vector<int> prune(nBitStrings.size()) ; // vector with 100 ints.
     std::iota (std::begin(prune), std::end(prune), 0); // Fill with 0, 1, ..., 2^N.
     for (int i = 0; i < subclauses.size(); i++) {
         // markera alla där det är "tvärtom"
         if (subclauses[i] != -1) {
             for(auto it = prune.begin(); it != prune.end();) {
-                if (subclauses[i] == isKthBitSet(*it, subclauses[i])) {
+                if (subclauses[i] == isKthBitSet(*it, i)) {
                     it = prune.erase(it);
                 } else {
                     ++it;
@@ -34,6 +46,7 @@ void markBitStrings(std::vector<bool> &nBitStrings, std::vector<int> &subclauses
             }
         }
     }
+    return prune;
 }
 
 
@@ -43,6 +56,7 @@ bool solve(){
 
     // Generera en vektor med 2^N element
     std::vector<bool> nBitStrings(pow(2,n), true);
+    std::set<int> unsatisfiableBitStrings{};
 
 
     /* Then, m lines follow corresponding to each clause. Each clause is a disjunction of literals in the
@@ -51,10 +65,10 @@ bool solve(){
      * */
     std::string clause;
     getline(std::cin, clause);
-    std::vector<int> subclauses(n, -1);
     /* skapa en map med index & dess del-clause (typ att {{X1 : true}, {X2: false}} om vi har X1 v ~X2 */
     while(m){
         getline(std::cin, clause);
+        std::vector<int> subclauses(n, -1);
         int pos{};
         std::string token;
         bool neg;
@@ -74,19 +88,25 @@ bool solve(){
         // We do not have disjunctions
         token = clause.substr(0, pos);
         neg = token[0] == '~';
+        if (neg)
+            token = token.substr(token.length() - 2,2);
         std::istringstream iss{token};
         iss >> x >> index;
         // num = std::stoi(token.substr(1 + neg, token.length())) - 1;
         subclauses[index - 1] = !neg;
         clause.erase(0, pos + 3);
+        std::vector<int> delBitstrings = markBitStrings(nBitStrings, subclauses);
+        for (const auto& elem : delBitstrings) {
+            unsatisfiableBitStrings.insert(elem);
+        }
         m--;
-        markBitStrings(nBitStrings, subclauses);
-
     }
-
-
-
-
+    int nr = pow(2,n) - 1;
+    if (containsAllValuesUpToN(unsatisfiableBitStrings, nr)) {
+        return false;
+    } else {
+        return true;
+    }
 
 
 }
