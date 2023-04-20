@@ -38,7 +38,7 @@ std::vector<int> markBitStrings(std::vector<bool> &nBitStrings, std::vector<int>
         // markera alla där det är "tvärtom"
         if (subclauses[i] != -1) {
             for(auto it = prune.begin(); it != prune.end();) {
-                if (subclauses[i] == isKthBitSet(*it, i)) {
+                if (subclauses[i] == abs(isKthBitSet(*it, i))) {
                     it = prune.erase(it);
                 } else {
                     ++it;
@@ -58,24 +58,22 @@ bool solve(){
     std::vector<bool> nBitStrings(pow(2,n), true);
     std::set<int> unsatisfiableBitStrings{};
 
-
     /* Then, m lines follow corresponding to each clause. Each clause is a disjunction of literals in the
      * form X or ~X for some, where ~X indicates the negation of the literal X. The “or” operator is denoted
      * by a ‘v’ character and is seperated from literals with a single space.
      * */
     std::string clause;
     getline(std::cin, clause);
-    /* skapa en map med index & dess del-clause (typ att {{X1 : true}, {X2: false}} om vi har X1 v ~X2 */
     while(m){
         getline(std::cin, clause);
-        std::vector<int> subclauses(n, -1);
         int pos{};
         std::string token;
         bool neg;
         int num;
         int index;
         char x;
-        while ((pos = clause.find(" v ")) != std::string::npos) {
+        std::vector<int> subclauses(n, -1);
+        while ((pos = clause.find(" v ")) != std::string::npos || clause.empty()) {
             // We have disjunctions
             token = clause.substr(0, pos);
             neg = token[0] == '~';
@@ -118,12 +116,13 @@ int main(){
 
     int testcases{};
     std::cin >> testcases;
+    std::string dummy;
+    getline(std::cin, dummy);
     for (int t{}; t < testcases; t++){
         if (solve())
             std::cout << "satisfiable\n";
         else
             std::cout << "unsatisfiable\n";
     }
-
     return 0;
 }
