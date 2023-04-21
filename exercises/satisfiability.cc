@@ -38,7 +38,7 @@ std::vector<int> markBitStrings(std::vector<bool> &nBitStrings, std::vector<int>
         // markera alla där det är "tvärtom"
         if (subclauses[i] != -1) {
             for(auto it = prune.begin(); it != prune.end();) {
-                if (subclauses[i] == abs(isKthBitSet(*it, i))) {
+                if (subclauses[i] == isKthBitSet(*it, i)) {
                     it = prune.erase(it);
                 } else {
                     ++it;
@@ -65,6 +65,8 @@ bool solve(){
     std::string clause;
     getline(std::cin, clause);
     while(m){
+        bool skip{};
+        std::cout << m << "\n";
         getline(std::cin, clause);
         int pos{};
         std::string token;
@@ -77,11 +79,22 @@ bool solve(){
             // We have disjunctions
             token = clause.substr(0, pos);
             neg = token[0] == '~';
+            if (neg)
+                token = token.substr(token.length() - 2,2);
             std::istringstream iss{token};
             iss >> x >> index;
             // num = std::stoi(token.substr(1 + neg, token.length())) - 1;
-            subclauses[index - 1] = !neg;
+            if (subclauses[index - 1] == -1) {
+                subclauses[index - 1] = !neg;
+            } else if (subclauses[index - 1] != !neg) {
+                skip = true;
+                break;
+                subclauses[index - 1] = -1;
+            }
             clause.erase(0, pos + 3);
+        }
+        if (skip){
+            continue;
         }
         // We do not have disjunctions
         token = clause.substr(0, pos);
@@ -91,7 +104,11 @@ bool solve(){
         std::istringstream iss{token};
         iss >> x >> index;
         // num = std::stoi(token.substr(1 + neg, token.length())) - 1;
-        subclauses[index - 1] = !neg;
+        if (subclauses[index - 1] == -1) {
+            subclauses[index - 1] = !neg;
+        } else if (subclauses[index - 1] != !neg) {
+            subclauses[index - 1] = -1;
+        }
         clause.erase(0, pos + 3);
         std::vector<int> delBitstrings = markBitStrings(nBitStrings, subclauses);
         for (const auto& elem : delBitstrings) {
@@ -105,11 +122,10 @@ bool solve(){
     } else {
         return true;
     }
-
-
 }
 
 int main(){
+
     std::ios::sync_with_stdio(false);
     std::cin.tie(NULL);
     std::cout.tie(NULL);
