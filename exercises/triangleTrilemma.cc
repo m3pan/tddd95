@@ -19,17 +19,10 @@ std::string solve(){
     std::cin >> x_1 >> y_1 >> x_2 >> y_2 >> x_3 >> y_3;
 
     // Determine if the points generate a valid triangle
-    double area1 = abs((x_1*(y_2 - y_3) + x_2*(y_3 - y_1) + x_3*(y_1 - y_2)) / 2);
-
-    double side1 = sqrt((x_2-x_1)*(x_2-x_1) + (y_2-y_1)*(y_2-y_1));
-    double side2 = sqrt((x_3-x_2)*(x_3-x_2) + (y_3-y_2)*(y_3-y_2));
-    double side3 = sqrt((x_1-x_3)*(x_1-x_3) + (y_1-y_3)*(y_1-y_3));
-
-    double s = (side1 + side2 + side3) / 2;
-    double area2 = sqrt(s * (s-side1) * (s-side2) * (s-side3));
 
 
-    if (!area1 && !area2) {
+    bool colinear = x_1 * (y_2 - y_3) + x_2 * (y_3 - y_1) + x_3 * (y_1 - y_2);
+    if (colinear == 0) {
         return "not a triangle";
     }
 
@@ -37,6 +30,9 @@ std::string solve(){
     // length. If all three sides have different lengths, then the triangle is scalene. Otherwise, if at least two
     // sides have the same length, the triangle is isosceles.
 
+    double side1 = sqrt((x_2-x_1)*(x_2-x_1) + (y_2-y_1)*(y_2-y_1));
+    double side2 = sqrt((x_3-x_2)*(x_3-x_2) + (y_3-y_2)*(y_3-y_2));
+    double side3 = sqrt((x_1-x_3)*(x_1-x_3) + (y_1-y_3)*(y_1-y_3));
 
     // Determine if the triangle is scalene or isosceles
     if (side1 != side2 && side2 != side3 && side1 != side3) {
@@ -51,10 +47,7 @@ std::string solve(){
     // longest side is greater than the sum of the squares of the other two sides, the triangle is obtuse. If the
     // square of the longest side is equal to the sum of the squares of the other two sides, the triangle is right.
     // Otherwise, the triangle is acute.
-
-    // std::vector sides = {side1, side2, side3};
-    // std::sort(sides.begin(), sides.end());
-
+    double longestSide{};
     if (side1 >= side2 && side1 >= side3) {
         longestSide = side1;
     } else if (side2 >= side1 && side2 >= side3) {
