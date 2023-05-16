@@ -5,16 +5,7 @@
 #include <bitset> // for std::cout
 #include <unordered_map>
 
-void uxuhulVoting(int votingPriests, int currPriest, const std::vector<std::vector <int>>& preferences);
-
-// std::unordered_map<int,int>states = {{0b000, 1}, {0b001, 2}, {0b010, 3}, {0b011, 4},
-                                                // {0b100, 5}, {0b101, 6}, {0b110, 7}, {0b111, 8}};
-std::unordered_map<int,int>states = {{1,0b000}, {2,0b001}, {3,0b010}, {4,0b011},
-                                     {5, 0b100}, {6,0b101}, {7,0b110}, {8,0b111}};
-
-std::unordered_map<int, int>oddPriests = {{2, 0b001}, {3, 0b010}, {5, 0b100}};
-
-std::unordered_map<int, int>evenPriests = {{1, 0b000}, {4, 0b011}, {6, 0b101}, {7, 0b110}};
+void uxuhulVoting(std::vector<std::vector<int>> preferences);
 
 int countStoneFlips(int firstStone, int secondStone){
     int n = firstStone ^ secondStone;
@@ -25,7 +16,9 @@ int countStoneFlips(int firstStone, int secondStone){
     }
     return flips;
 }
-
+// change to zero-indexed
+std::unordered_map<int, int> states = {{0b000, 0}, {0b001, 1}, {0b010, 2}, {0b011, 3}, {0b100, 4}, {0b101, 5}, {0b110, 6}, {0b111, 7}};
+std::unordered_map<int, std::string> convertStates = {{0, "NNN"}, {1, "NNY"}, {2, "NYN"}, {3, "NYY"}, {4, "YNN"}, {5, "YNY"}, {6, "YYN"}, {7, "YYY"}};
 
 int main() {
     int votingRounds{};
@@ -56,136 +49,94 @@ int main() {
             }
             preferences.push_back(singleRow);
         }
-        int currPriest{};
-        uxuhulVoting(votingPriests, currPriest, preferences);
+        uxuhulVoting(preferences);
     }
     return 0;
 }
 
-void uxuhulVoting(int votingPriests, int currPriest, const std::vector<std::vector <int>>& preferences) {
-
+void uxuhulVoting(std::vector<std::vector<int>> preferences) {
     // Börja med äldsta prästen, vi vet vilka 4 alternativ den har att välja på.
     // Den översätter de fyra inputs till output beroende på egna preferenser. map!!
     // Skicka de fyra rankningarna till äldre som rankar om baserat på översättningen. Då tar den ett beslut baserat på översättning
 
     std::map<int, int> comprehensiveMap{};
 
+    //!! Let the last priest make its choices
+    // Determine what states the priest could get
 
-    for (int priest = votingPriests; priest > 0; priest--) {
-        int remainingPriests = votingPriests - currPriest;
-        std::vector<int> possiblePref{}; // our output
-        std::map<int, int> preferredOutputs{};  // {input : output}
-        // determine what states the priest could get
-        std::unordered_map<int, int> inputStates;
-        std::unordered_map<int, int> outputStates;
+    std::vector<int> inputStates;
+    std::vector<int> outputStates;
+    int votingPriests = preferences.size();
+    if (votingPriests % 2 == 1) {
+        // Odd priest, odd input
+        inputStates = {0b011, 0b110, 0b101, 0b000};
+        outputStates = {0b001, 0b010, 0b100, 0b111};
+    } else {
+        // Even priest, even input
+        inputStates = {0b001, 0b010, 0b100, 0b111};
+        outputStates = {0b011, 0b110, 0b101, 0b000};
+    }
 
-        if (priest == 1) {
-            // The first is a special case
-            // possibleStates = {{001, 2}, {010, 3}, {100, 5}}; // todo: add outputStates
-            inputStates = {{1, 0b000}};
-            outputStates = {{2, 0b001},
-                            {3, 0b010},
-                            {5, 0b100}};
-        } else if (priest % 2 == 0) {
+    //todo: remove iterators, change to vectors
+    for (int inputStone : inputStates) {
+        int pref{1000};
+        // For each input state, determine what output is desirable and store it in a map
+        std::unordered_map<int, int>::iterator outputIt;
+        // Determine possible outputs for each input, {score : output}. The map is sorted based on score
+        //std::map<int, int> possibleOutputs{};
+        for (int outputStone : outputStates) {
+            if (countStoneFlips(inputStone, outputStone) == 1 && preferences.back()[states[outputStone]] < pref) {
+                // Enters the most preferable output for each input
+                pref = preferences.back()[states[outputStone]];
+                comprehensiveMap[inputStone] = outputStone;
+            }
+        }
+    }
+    --votingPriests;    // här är det rätt
+
+    // Let the rest of the priests make their choices
+    // todo: dubbelkolla for-loop index
+
+    // Set inputStates and outputStates
+
+    for (int i = preferences.size()-2; i >= 0; --i) {
+        if (votingPriests % 2) {
+            // possibleStates = {{001, 2}, {010, 3}, {100, 5}, {111, 8}};
+            inputStates = {0b011, 0b110, 0b101, 0b000}; ;
+            outputStates = {0b001, 0b010, 0b100, 0b111};
+        } else {
             // Even priest, odd input
             // possibleStates = {{000, 1}, {011, 4}, {101, 6}, {110, 7}};
-            inputStates = {{2, 0b001},
-                           {3, 0b010},
-                           {5, 0b100},
-                           {8, 0b111}};
-            outputStates = {{1, 0b000},
-                            {4, 0b011},
-                            {6, 0b101},
-                            {7, 0b110}};
-        } else {
-            // Odd priest, even input
-            // possibleStates = {{001, 2}, {010, 3}, {100, 5}, {111, 8}};
-            inputStates = {{1, 0b000},
-                           {4, 0b011},
-                           {6, 0b101},
-                           {7, 0b110}};
-            outputStates = {{2, 0b001},
-                            {3, 0b010},
-                            {5, 0b100},
-                            {8, 0b111}};
+            inputStates = {0b001, 0b010, 0b100, 0b111};
+            outputStates = {0b011, 0b110, 0b101, 0b000}; ;
         }
+        // Determine the optimal choice for all the following priests
+        std::unordered_map<int, int> comprehensiveMap2;
         std::unordered_map<int, int>::iterator inputIt;
-        for (inputIt = inputStates.begin(); inputIt != inputStates.end(); inputIt++) {
-            // For each input state, determine what output is desirable and store it in a map
-            std::unordered_map<int, int>::iterator outputIt;
-            // Determine possible outputs for each input, {score : output}. The map is sorted based on score
-            std::map<int, int> possibleOutputs{};
-            for (outputIt = outputStates.begin(); outputIt != inputStates.end(); outputIt++) {
-                if (priest == 1 && countStoneFlips(inputIt->second, outputIt->second) == 1) {
-                    possibleOutputs.insert({preferences[priest-1][outputIt->first-1], outputIt->first});
-                } else if (countStoneFlips(inputIt->second, outputIt->second) == 1) {
-                    possibleOutputs.insert({preferences[priest-2][outputIt->first-1], outputIt->first});
-                    // bestäm outputIt->second värde och lägg i en lista
-                    // std::cout << preferences[priest-1][outputIt->first] << std::endl;
-                    // Skapa en map från inputIt till outputIt
+        for (int inputStone : inputStates) {
+            int pref{1000};
+            for (int outputStone : outputStates) {
+                if (countStoneFlips(inputStone, outputStone) == 1 && preferences[i][states[comprehensiveMap[outputStone]]] < pref) {
+                    //std::cout << "preferences: " << preferences[i][states[comprehensiveMap[outputStone]]] << std::endl;
+                    pref = preferences[i][states[comprehensiveMap[outputStone]]];
+                    comprehensiveMap2[inputStone] = outputStone;
                 }
             }
-            // The most desirable output
-            int chosenOutput = possibleOutputs.find((possibleOutputs.begin())->first)->second;
-            preferredOutputs.insert({inputIt->first, chosenOutput});
         }
-        if (priest == votingPriests)
-        {
-            comprehensiveMap = preferredOutputs;
-            continue;
-        } else {
-            std::map<int, int> comprehensiveMap2{};
-            // let comprehensiveMap be like {olderInput: olderOutput} and connect it with preferredOutputs {newInput : newOutput}
-            for (const auto& pairA : preferredOutputs) {
-                int keyA = pairA.first;
-                int valueA = pairA.second;
 
-                // check if the key exists in map B
-                auto it = comprehensiveMap.find(valueA);
-                if (it != comprehensiveMap.end()) {
-                    int valueB = it->second;
-                    comprehensiveMap2[keyA] = valueB;
-                }
-            }
-            comprehensiveMap = comprehensiveMap2;
+
+        for (std::pair<int,int> c : comprehensiveMap2) {
+            comprehensiveMap[c.first] = comprehensiveMap[c.second];
         }
+        // titta på den resulterande mapen
+        /*auto it = comprehensiveMap.find(1);
+        if (it != comprehensiveMap.end()) {
+            std::cout << std::bitset<3>(states.find(it->second)->second) << std::endl;
+        }*/
+
+        --votingPriests;
     }
-    // titta på den resulterande mapen
-    auto it = comprehensiveMap.find(1);
-    if (it != comprehensiveMap.end()) {
-        std::cout << std::bitset<3> (states.find(it->second)->second) << std::endl;
-    }
+    std::cout << convertStates[comprehensiveMap[0b000]] << "\n";
+    //std::cout << std::bitset<3>(comprehensiveMap[0b000]) << "\n";
 }
 
-        /*
-            std::cout << it->first    // string (key)
-                      << ':'
-                      << it->second   // string's value
-                      << std::endl;
-            // inputStates = {{2, 001}, {3, 010}, {5, 100}};
-            // inputStates = {{1, 000}, {4, 011}, {6, 101}, {7, 110}};
-*/
-    /*
-
-        // sort the states based on how valuable they are
-        for (int pref = 1; pref <= 8; pref++)
-        {
-            if(inputStates.count(preferences[priest][pref]))
-            {
-                possiblePref.push_back(preferences[priest][pref]);
-            }
-        }
-
-        std::unordered_map<std::bitset<3>,int>::iterator it;
-
-        for (it = possibleStates.begin(); it != possibleStates.end(); it++)
-        {
-            std::cout << it->first    // string (key)
-                      << ':'
-                      << it->second   // string's value
-                      << std::endl;
-                                  inputStates = {{2, 001}, {3, 010}, {5, 100}};
-                                              inputStates = {{1, 000}, {4, 011}, {6, 101}, {7, 110}};
-
-
-        }*/
