@@ -12,9 +12,12 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cstdio>
 
 
-std::vector<double> fenwickTree(5000000,0);
+//std::vector<double> fenwickTree(5000000,0);
+double* fenwickTree;
+
 
 /**
  * Calculates the index of the parent element in the Fenwick tree for the given index i. It performs a bitwise
@@ -49,8 +52,8 @@ int h(int i) {
  * @param delta The value to be added to the existing value at the specified index.
  * */
 
-void add(int index, double delta) {
-    for (int j = index; j < fenwickTree.size(); j |= (j + 1))
+void add(int index, double delta, int N) {
+    for (int j = index; j < N; j |= (j + 1))
         fenwickTree[j] += delta;
 }
 
@@ -78,7 +81,7 @@ int main() {
     int N, Q;
     std::cin >> N >> Q;
 
-    fenwickTree.resize(N);
+    fenwickTree = new double[N]();
 
     std::cout << std::fixed;
     std::cout.precision(0);
@@ -93,7 +96,7 @@ int main() {
             double delta;
             std::cin >> i >> delta;
             // Update the Fenwick tree by adding delta to the elements with index i and its descendants
-            add(i, delta);
+            add(i, delta, N);
         } else if (queryType == '?') {
             // Sum query, begin by reading the index
             int i;
