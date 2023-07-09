@@ -17,6 +17,7 @@
 
 //std::vector<double> fenwickTree(5000000,0);
 double* fenwickTree;
+int N, Q;
 
 
 /**
@@ -52,10 +53,17 @@ int h(int i) {
  * @param delta The value to be added to the existing value at the specified index.
  * */
 
-void add(int index, double delta, int N) {
-    for (int j = index; j < N; j |= (j + 1))
-        fenwickTree[j] += delta;
+void add(int index, double delta) {
+    for(; index< N; index|=(index+1)){
+        fenwickTree[index] = fenwickTree[index] + delta;
+    }
 }
+
+/* for(; index< N; index|=(index+1)){
+        fenwicktree[index] = fenwicktree[index] + delta;
+    }
+ *
+ * */
 
 /**
  * Computes the sum of the numbers up to, but not including, the element at index end in the Fenwick tree.
@@ -65,11 +73,16 @@ void add(int index, double delta, int N) {
  * */
 
 double sum(int end) {
-    double res = 0.0;
+    double res = 0;
+    /*
     while (end >= 0) {
         res += fenwickTree[end];
         end = (end & (end + 1)) - 1;
+    }*/
+    for(;end > 0; end &= end-1){
+        res += fenwickTree[end-1];
     }
+
     return res;
 }
 
@@ -78,15 +91,19 @@ int main() {
     std::cin.tie(NULL);
     std::cout.tie(NULL);
 
-    int N, Q;
+
     std::cin >> N >> Q;
+    N = N+1;
 
     fenwickTree = new double[N]();
+
+    //fenwickTree.assign(0, N);
+    //fenwickTree.resize(N);
 
     std::cout << std::fixed;
     std::cout.precision(0);
 
-    for (int j = 0; j < Q; ++j) {
+    for (long long j = 0; j < Q; ++j) {
         char queryType;
         std::cin >> queryType;
 
@@ -96,13 +113,13 @@ int main() {
             double delta;
             std::cin >> i >> delta;
             // Update the Fenwick tree by adding delta to the elements with index i and its descendants
-            add(i, delta, N);
+            add(i, delta);
         } else if (queryType == '?') {
             // Sum query, begin by reading the index
             int i;
             std::cin >> i;
             // Calculate and print the sum
-            std::cout << sum(i - 1) << '\n';
+            std::cout << sum(i) << '\n';
         } else {
             std::cerr << "Error: Invalid query. Please enter a valid query.\n";
         }
