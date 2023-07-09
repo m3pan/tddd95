@@ -10,40 +10,10 @@
  * */
 
 #include <iostream>
-#include <sstream>
 #include <vector>
-#include <cstdio>
 
-
-//std::vector<double> fenwickTree(5000000,0);
 double* fenwickTree;
 int N, Q;
-
-
-/**
- * Calculates the index of the parent element in the Fenwick tree for the given index i. It performs a bitwise
- * AND operation between i and i + 1 to calculate the index.
- *
- * @param i The index for which to calculate the parent index.
- */
-
-int g(int i) {
-    //int nextIndex = i & (i + 1);
-    return i & (i + 1); // Equivalent to i - (i & -i)
-}
-
-
-/**
- * Computes the index of the next element after i in the Fenwick tree that has the same parent.
- * It performs a bitwise OR operation between i and i + 1 to efficiently calculate this index.
- *
- * @param i The index for which to calculate the next element in the Fenwick tree that has the same parent
- * */
-
-int h(int i) {
-    //int nextIndex = i | (i + 1);
-    return i | (i + 1); // Equivalent to i + (i & -i)
-}
 
 
 /**
@@ -54,16 +24,12 @@ int h(int i) {
  * */
 
 void add(int index, double delta) {
-    for(; index< N; index|=(index+1)){
-        fenwickTree[index] = fenwickTree[index] + delta;
+    while (index < N) {
+        fenwickTree[index] += delta;
+        // Calculate the index of the next element in the Fenwick tree with the same parent
+        index |= (index + 1);
     }
 }
-
-/* for(; index< N; index|=(index+1)){
-        fenwicktree[index] = fenwicktree[index] + delta;
-    }
- *
- * */
 
 /**
  * Computes the sum of the numbers up to, but not including, the element at index end in the Fenwick tree.
@@ -72,17 +38,15 @@ void add(int index, double delta) {
  * @return The sum of the numbers up to index end in the Fenwick tree.
  * */
 
-double sum(int end) {
-    double res = 0;
-    /*
-    while (end >= 0) {
-        res += fenwickTree[end];
-        end = (end & (end + 1)) - 1;
-    }*/
-    for(;end > 0; end &= end-1){
-        res += fenwickTree[end-1];
+long long sum(int end) {
+    /* Using long long allows for more efficient memory usage and better compatibility with the underlying bitwise
+     * operations used in the Fenwick tree implementation. */
+    long long res = 0;
+    while (end > 0) {
+        res += fenwickTree[end - 1];
+        // Calculate the index of the parent of the current index in the Fenwick tree
+        end = end & (end - 1);
     }
-
     return res;
 }
 
@@ -91,14 +55,12 @@ int main() {
     std::cin.tie(NULL);
     std::cout.tie(NULL);
 
-
     std::cin >> N >> Q;
+    // One-based indexing
     N = N+1;
 
+    // Initialize the Fenwick tree with zeros
     fenwickTree = new double[N]();
-
-    //fenwickTree.assign(0, N);
-    //fenwickTree.resize(N);
 
     std::cout << std::fixed;
     std::cout.precision(0);
